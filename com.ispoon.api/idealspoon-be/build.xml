@@ -1,0 +1,64 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE project>
+<project name="reportd-support" default="help" basedir="." xmlns:artifact="antlib:org.apache.maven.artifact.ant">
+
+	<path id="maven-ant-tasks.classpath" path="etc/lib/maven-ant-tasks-2.1.1.jar" />
+	<typedef resource="org/apache/maven/artifact/ant/antlib.xml" uri="antlib:org.apache.maven.artifact.ant" classpathref="maven-ant-tasks.classpath" />
+
+	<!--<artifact:dependencies pathId="ant-contrib-lib">-->
+		<!--<dependency groupId="ant-contrib" artifactId="ant-contrib" version="1.0b3" />-->
+	<!--</artifact:dependencies>-->
+	<!--<taskdef resource="net/sf/antcontrib/antlib.xml" classpathref="ant-contrib-lib" />-->
+
+	<property name="hibernateConfig" location="etc/hibernate.cfg.xml"/>
+	<property name="hibernateReveng" location="etc/hibernate.reveng.xml"/>
+
+	<target name="make-pojos">
+
+		<artifact:dependencies pathId="hibernate-tools-lib">
+			<remoteRepository id="internal" url="http://archiva.inpwrd-a.com/archiva/repository/internal" />
+			<remoteRepository id="jboss" url="http://repository.jboss.org/nexus/content/groups/public-jboss" />
+
+			<dependency groupId="org.hibernate" artifactId="hibernate-core" version="3.3.2.GA" />
+			<dependency groupId="org.hibernate" artifactId="hibernate-tools" version="3.2.4.GA" />
+			<dependency groupId="mysql" artifactId="mysql-connector-java" version="5.1.13" />
+			<dependency groupId="commons-logging" artifactId="commons-logging" version="1.1.1" />
+			<dependency groupId="org.slf4j" artifactId="slf4j-api" version="1.6.1" />
+			<dependency groupId="org.slf4j" artifactId="slf4j-simple" version="1.6.1" />
+			<dependency groupId="cglib" artifactId="cglib-nodep" version="2.1_3" />
+		</artifact:dependencies>
+
+		<taskdef name="hibernatetool" classname="org.hibernate.tool.ant.HibernateToolTask" classpathref="hibernate-tools-lib" />
+
+		<property name="srcBase" value="src/main/java" />
+		<property name="hibBase" value="${srcBase}/com/netshelter/ifbrands/data/entity" />
+		<property name="srcPack" value="com.netshelter.ifbrands.data.entity" />
+		<property name="cfgFile" value="etc/hibernate.cfg.xml" />
+		<property name="revFile" value="etc/hibernate.reveng.xml" />
+
+		<delete>
+			<fileset dir="${hibBase}" includes="*.java" />
+		</delete>
+		<hibernatetool destdir="${srcBase}">
+			<jdbcconfiguration configurationfile="${cfgFile}" packagename="${srcPack}" revengfile="${revFile}" detectmanytomany="true" />
+			<hbm2java jdk5="true" ejb3="true" />
+		</hibernatetool>
+	</target>
+
+	<target name="help">
+		<echo>
+help            This text
+
+make-pojos       Auto-generate POJO files from database.
+
+			Uses 'etc/hibernate.cfg.xml' for DB credentials
+			Uses 'etc/hibernate.reveng.xml' for  reverse engineering configuration
+			Writes output files to 'src/main/java'
+			Uses package of 'com.netshelter.ifbrands.data.entity'
+			Deletes all java files in output folder before generation
+		</echo>
+	</target>
+</project>
+
+
+

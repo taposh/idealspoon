@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/util 
+	http://www.springframework.org/schema/util/spring-util.xsd
+	http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context 
+	http://www.springframework.org/schema/context/spring-context.xsd
+	">
+		
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+		<property name="driverClass" value="${jdbc.ifbrands.driverClassName}" />
+		<property name="jdbcUrl" value="${jdbc.ifbrands.url}" />
+		<property name="user" value="${jdbc.ifbrands.username}" />
+		<property name="password" value="${jdbc.ifbrands.password}" />
+		<property name="idleConnectionTestPeriod" value="14400"/>
+        <property name="minPoolSize" value="10"/>
+        <property name="maxPoolSize" value="100"/>
+		<property name="maxIdleTime" value="25200"/>
+	</bean>
+
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="configLocation" value="classpath:hibernate.cfg.xml" />
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect"                       >${jdbc.ifbrands.dialect}</prop>
+				<prop key="hibernate.cache.region.factory_class"    >net.sf.ehcache.hibernate.SingletonEhCacheRegionFactory</prop>
+			    <prop key="hibernate.cache.use_query_cache"         >false</prop>
+			    <prop key="hibernate.cache.use_second_level_cache"  >true</prop>
+			    <prop key="hibernate.cache.use_structured_entries"  >true</prop>
+			    <prop key="hibernate.cache.generate_statistics"     >true</prop>
+			    <prop key="net.sf.ehcache.configurationResourceName">ehcache.xml</prop>
+			</props>
+		</property>
+	</bean>
+
+	<bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	
+	<bean name="baseDao" abstract="true" init-method="init">
+		<property name="sessionFactory" ref="sessionFactory"/>
+	</bean>
+	<bean id="userStateDao"                     parent="baseDao" class="com.netshelter.ifbrands.data.dao.UserStateDao"/>
+	<bean id="userValueDao"                     parent="baseDao" class="com.netshelter.ifbrands.data.dao.UserValueDao"/>
+	<bean id="storyAmplificationDao"            parent="baseDao" class="com.netshelter.ifbrands.data.dao.StoryAmplificationDao"/>
+	<bean id="campaignDao"                      parent="baseDao" class="com.netshelter.ifbrands.data.dao.CampaignDao"/>
+    <bean id="notesDao"                         parent="baseDao" class="com.netshelter.ifbrands.data.dao.NotesDao"/>
+	<bean id="campaignTypeDao"                  parent="baseDao" class="com.netshelter.ifbrands.data.dao.CampaignDao$CampaignTypeDao"/>
+    <bean id="campaignTrackingDao"              parent="baseDao" class="com.netshelter.ifbrands.data.dao.TrackingDao"/>
+	<bean id="campaignStatusDao"                parent="baseDao" class="com.netshelter.ifbrands.data.dao.CampaignDao$CampaignStatusDao"/>
+	<bean id="adDao"                            parent="baseDao" class="com.netshelter.ifbrands.data.dao.AdDao"/>
+	<bean id="adTypeDao"                        parent="baseDao" class="com.netshelter.ifbrands.data.dao.AdDao$AdTypeDao"/>
+	<bean id="adStatusDao"                      parent="baseDao" class="com.netshelter.ifbrands.data.dao.AdDao$AdStatusDao"/>
+    <bean id="adStateDao"                       parent="baseDao" class="com.netshelter.ifbrands.data.dao.AdDao$AdStateDao"/>
+	<bean id="feedDao"                          parent="baseDao" class="com.netshelter.ifbrands.data.dao.FeedDao"/>
+	<bean id="feedStoryDao"                     parent="baseDao" class="com.netshelter.ifbrands.data.dao.FeedDao$FeedStoryDao"/>
+	<bean id="feedStoryStatusDao"               parent="baseDao" class="com.netshelter.ifbrands.data.dao.FeedDao$FeedStoryStatusDao"/>
+    <bean id="actionLogDao"                     parent="baseDao" class="com.netshelter.ifbrands.data.dao.ActionLogDao"/>
+    <bean id="adSizeDao"                        parent="baseDao" class="com.netshelter.ifbrands.data.dao.AdSizeDao"/>
+    <bean id="adNetworkDao"                     parent="baseDao" class="com.netshelter.ifbrands.data.dao.AdNetworkDao"/>
+    <bean id="surveyResponseDao"                parent="baseDao" class="com.netshelter.ifbrands.data.dao.SurveyResponseDao"/>
+    <bean id="surveyResponseLogDao"             parent="baseDao" class="com.netshelter.ifbrands.data.dao.SurveyResponseLogDao"/>
+    <bean id="surveyQuestionTypeAnswerDao"      parent="baseDao" class="com.netshelter.ifbrands.data.dao.SurveyQuestionTypeAnswerDao"/>
+    <bean id="surveyAnswerDao"                  parent="baseDao" class="com.netshelter.ifbrands.data.dao.SurveyAnswerDao"/>
+
+</beans>

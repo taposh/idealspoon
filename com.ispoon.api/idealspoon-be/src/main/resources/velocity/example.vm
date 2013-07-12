@@ -1,0 +1,6 @@
+This is an example of Velocity Template file.
+<script>
+    // <!--
+    alert("Testing $someparam");
+    // -->
+</script>

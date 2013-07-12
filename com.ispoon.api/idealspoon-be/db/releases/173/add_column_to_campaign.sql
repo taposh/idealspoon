@@ -1,0 +1,1 @@
+ALTER TABLE ifb_campaign ADD COLUMN `client_user_key` VARCHAR(255) AFTER `user_key`;

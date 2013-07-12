@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:camel="http://camel.apache.org/schema/spring"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/util 
+	http://www.springframework.org/schema/util/spring-util.xsd
+	http://www.springframework.org/schema/beans 
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context 
+	http://www.springframework.org/schema/context/spring-context.xsd
+	http://camel.apache.org/schema/spring 
+	http://camel.apache.org/schema/spring/camel-spring.xsd
+	">
+		
+	<camel:camelContext id="ctx.camel" trace="false">
+		<camel:routeBuilder ref="healthCheckRoute"/>
+	</camel:camelContext>
+
+	<bean id="baseRoute" abstract="true" class="com.netshelter.ifbrands.route.BaseRoute">
+		<property name="simpleTrace" value="false"/>
+	</bean>
+
+	<bean id="errorRoute" abstract="true" parent="baseRoute" class="com.netshelter.ifbrands.route.ErrorRoute">
+		<property name="snsUriFormat" 		value="aws-sns://%s?amazonSNSClient=#aws.sns.client"/>	
+		<property name="snsTopicWarning"    value="${sns.ifb.warning}"/>
+		<property name="snsTopicCritical"   value="${sns.ifb.critical}"/>
+		<property name="snsSubjectWarning"  value="WARNING:  ${app.ifb.stack}-${app.ifb.name}"/>
+		<property name="snsSubjectCritical" value="CRITICAL: ${app.ifb.stack}-${app.ifb.name}"/>
+	</bean>
+
+	<bean id="healthCheckRoute" parent="errorRoute" class="com.netshelter.ifbrands.route.HealthCheckRoute">
+		<property name="pollingPeriod" value="${ifb.healthcheck.pollingPeriod}"/>
+	</bean>
+	
+</beans>

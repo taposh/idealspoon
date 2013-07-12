@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:cache="http://www.springframework.org/schema/cache"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd
+	http://www.springframework.org/schema/util
+	http://www.springframework.org/schema/util/spring-util.xsd
+	http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/cache
+	http://www.springframework.org/schema/cache/spring-cache.xsd
+	http://www.springframework.org/schema/context
+	http://www.springframework.org/schema/context/spring-context.xsd
+	">
+	<!-- Set auto-marshalling w/ custom jackson ObjectMapper (for JODA objects)
+		-->
+	<mvc:annotation-driven>
+		<mvc:message-converters register-defaults="false">
+			<bean class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter">
+				<property name="objectMapper">
+					<bean class="com.netshelter.ifbrands.util.JacksonUtils$JacksonCustomObjectMapper"/>
+				</property>
+			</bean>
+		</mvc:message-converters>
+	</mvc:annotation-driven>
+	
+	<!-- Register HandlerInterceptors -->
+	<mvc:interceptors>
+		<bean class="com.netshelter.ifbrands.api.util.AuthenticationInterceptor" />
+		<bean class="com.netshelter.ifbrands.api.util.RequestContextInterceptor" />
+	</mvc:interceptors>
+
+	<!-- Enable Spring cache annotations -->
+	<cache:annotation-driven/>
+	
+	<!-- Create EhCacheManger backed by EhCache
+	 	Also: We share the Singleton EhCache created by Hibernate 
+		Thus: Cannot do any custom config here; do it in ehcache.xml -->
+	<bean id="mvcEhCache" class="org.springframework.cache.ehcache.EhCacheManagerFactoryBean">
+		<property name="shared" value="true"/>
+	</bean>
+	<bean id="ehCacheManager" class="org.springframework.cache.ehcache.EhCacheCacheManager">
+		<property name="cacheManager" ref="mvcEhCache"/>
+	</bean>
+
+	<!-- Wrap in our Context-controlled facade to honour configuration via request params
+		Note: Spring will use the CacheManager named 'cacheManager' by default -->
+	<bean id="cacheManager" class="com.netshelter.ifbrands.cache.ContextControlledCacheManagerFacade">
+		<property name="delegate" ref="ehCacheManager"/>
+		<property name="prefixParamNames">
+			<list>
+				<!-- Values provided by RequestContextInterceptor to use as key prefix -->
+				<value>ifbconfig</value>
+				<value>napconfig</value>
+				<value>dpconfig</value>
+			</list>
+		</property>
+	</bean>
+	<!-- Enable our CollectionCache aspect with same CacheManage -->
+	<bean id="collectionCacheAspect"    class="com.netshelter.ifbrands.cache.CollectionCacheAspect">
+		<property name="cacheManager" ref="cacheManager"/>
+	</bean>
+	<!-- TimingFilter auto-sends request time info to Stats client -->
+	<bean id="timingFilter"             class="com.netshelter.ifbrands.api.util.IFBrandsTimingFilter"/>
+	<!-- Services -->
+	<bean name="statusService"          class="com.netshelter.ifbrands.api.service.StatusServiceImpl">
+		<property name="buildVersion"    ref="buildVersion"/>
+		<property name="jdbcUrl"         value="${jdbc.ifbrands.url}"/>
+	</bean>
+	<bean name="userService"            class="com.netshelter.ifbrands.api.service.UserServiceImpl">
+		<property name="userManagementAuthority" value="${usermanager.authority}"/>
+	</bean>
+    <bean name="userManagementServices" class="com.netshelter.ifbrands.api.service.UserManagementServicesImpl">
+        <property name="userManagementAuthority" value="${usermanager.authority}"/>
+    </bean>
+	<bean name="entityService"          class="com.netshelter.ifbrands.api.service.EntityServiceImpl"/>
+	<bean name="influenceService"       class="com.netshelter.ifbrands.api.service.InfluenceServiceImpl"/>
+	<bean name="campaignService"        class="com.netshelter.ifbrands.api.service.CampaignServiceImpl"/>
+    <bean name="trackingService"        class="com.netshelter.ifbrands.api.service.TrackingServiceImpl"/>
+    <bean name="adSizeService"          class="com.netshelter.ifbrands.api.service.AdSizeServiceImpl"/>
+    <bean name="adNetworkService"       class="com.netshelter.ifbrands.api.service.AdNetworkServiceImpl"/>
+    <bean name="actionLogService"       class="com.netshelter.ifbrands.api.service.ActionLogServiceImpl"/>
+    <bean name="surveyService"          class="com.netshelter.ifbrands.api.service.SurveyServiceImpl"/>
+    <bean name="templateService"        class="com.netshelter.ifbrands.api.service.TemplateServiceImpl">
+        <property name="shortyAuthority" value="${shorty.authority}"/>
+    </bean>
+	<bean name="shareService"           class="com.netshelter.ifbrands.api.service.ShareServiceImpl">
+		<property name="shareApiAuthority" value="${shareapi.authority}"/>
+	</bean>
+	<bean name="saService"              class="com.netshelter.ifbrands.etl.shareapi.SaServicesImpl">
+		<property name="shareApiAuthority" value="${shareapi.authority}"/>
+	</bean>
+	<bean name="adService"              class="com.netshelter.ifbrands.api.service.AdServiceImpl"/>
+	<bean name="feedService"            class="com.netshelter.ifbrands.api.service.FeedServiceImpl"/>
+	<bean name="publishService"         class="com.netshelter.ifbrands.publish.PublishServiceImpl">
+		<property name="storyFeedBucket" value="${netshelter.ifb.s3.bucket.feeds}"/>
+		<property name="cdnFeedEndPoint"  value="${netshelter.ifb.cdn.endpoint.feeds}"/>
+	</bean>
+	<!-- Define JSP view resolver. JSP files to be found in 'WEB-INF/jsp' folder.
+		-->
+	<bean id="viewResolver"             class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="viewClass" value="org.springframework.web.servlet.view.JstlView"/>
+		<property name="prefix" value="/WEB-INF/jsp/"/>
+		<property name="suffix" value=".jsp"/>
+	</bean>
+</beans>

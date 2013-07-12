@@ -1,0 +1,83 @@
+<ehcache	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+			xsi:noNamespaceSchemaLocation="ehcache.xsd"	
+			name="data-cache" updateCheck="false"
+	>
+
+	<diskStore path="java.io.tmpdir/ifb-cache/data"/>
+
+	<!-- Default cache -->
+	<defaultCache maxElementsInMemory="1000" eternal="false" timeToIdleSeconds="120"
+		timeToLiveSeconds="120" overflowToDisk="true" diskSpoolBufferSizeMB="30"
+		maxElementsOnDisk="100000" diskPersistent="false" diskExpiryThreadIntervalSeconds="10"
+		memoryStoreEvictionPolicy="LRU"  />
+
+	<!-- The unnamed query cache -->
+	<cache name="org.hibernate.cache.StandardQueryCache"
+		maxEntriesLocalHeap="1000"
+		eternal="false" timeToLiveSeconds="120" overflowToDisk="true" />
+
+	<!-- Timestamps of updates to tables -->
+	<cache name="org.hibernate.cache.UpdateTimestampsCache" maxEntriesLocalHeap="5000"
+		eternal="true" overflowToDisk="true"
+	/>
+
+	<!-- Hibernate L2 Cache -->
+    <cache name="com.netshelter.ifbrands.data.entity.IfbAd"                     maxEntriesLocalHeap="10000" eternal="false" timeToLiveSeconds="300" overflowToDisk="false" />
+    <cache name="com.netshelter.ifbrands.data.entity.IfbAdNetwork"              maxEntriesLocalHeap="10000" eternal="false" timeToLiveSeconds="300" overflowToDisk="false" />
+    <cache name="com.netshelter.ifbrands.data.entity.IfbAdStatus"               maxEntriesLocalHeap="10000" eternal="false" timeToLiveSeconds="300" overflowToDisk="false" />
+    <cache name="com.netshelter.ifbrands.data.entity.IfbAdSize"                 maxEntriesLocalHeap="10000" eternal="false" timeToLiveSeconds="300" overflowToDisk="false" />
+    <cache name="com.netshelter.ifbrands.data.entity.IfbActionLog"              maxEntriesLocalHeap="10000" eternal="false" timeToLiveSeconds="300" overflowToDisk="false" />
+    <cache name="com.netshelter.ifbrands.data.entity.IfbAdType"                 maxEntriesLocalHeap="10000" eternal="false" timeToLiveSeconds="300" overflowToDisk="false" />
+    <cache name="com.netshelter.ifbrands.data.entity.IfbCampaign"               maxEntriesLocalHeap="10000" eternal="false" timeToLiveSeconds="300" overflowToDisk="false" />
+    <cache name="com.netshelter.ifbrands.data.entity.IfbCampaignStatus"         maxEntriesLocalHeap="10000" eternal="false" timeToLiveSeconds="300" overflowToDisk="false" />
+    <cache name="com.netshelter.ifbrands.data.entity.IfbCampaignType"           maxEntriesLocalHeap="10000" eternal="false" timeToLiveSeconds="300" overflowToDisk="false" />
+    <cache name="com.netshelter.ifbrands.data.entity.IfbTracking"               maxEntriesLocalHeap="10000" eternal="false" timeToLiveSeconds="300" overflowToDisk="false" />
+    <cache name="com.netshelter.ifbrands.data.entity.IfbFeed"                   maxEntriesLocalHeap="10000" eternal="false" timeToLiveSeconds="300" overflowToDisk="false" />
+    <cache name="com.netshelter.ifbrands.data.entity.IfbFeedStory"              maxEntriesLocalHeap="10000" eternal="false" timeToLiveSeconds="300" overflowToDisk="false" />
+    <cache name="com.netshelter.ifbrands.data.entity.IfbFeedStoryStatus"        maxEntriesLocalHeap="10000" eternal="false" timeToLiveSeconds="300" overflowToDisk="false" />
+    <cache name="com.netshelter.ifbrands.data.entity.IfbStoryAmplification"     maxEntriesLocalHeap="10000" eternal="false" timeToLiveSeconds="300" overflowToDisk="false" />
+    <cache name="com.netshelter.ifbrands.data.entity.IfbNotes"                  maxEntriesLocalHeap="10000" eternal="false" timeToLiveSeconds="300" overflowToDisk="false" />
+    <cache name="com.netshelter.ifbrands.data.entity.IfbUserState"              maxEntriesLocalHeap="10000" eternal="false" timeToLiveSeconds="300" overflowToDisk="false" />
+    <cache name="com.netshelter.ifbrands.data.entity.IfbUserValue"              maxEntriesLocalHeap="10000" eternal="false" timeToLiveSeconds="300" overflowToDisk="false" />
+    <cache name="com.netshelter.ifbrands.data.entity.IfbSurveyQuestionType"     maxEntriesLocalHeap="10000" eternal="false" timeToLiveSeconds="300" overflowToDisk="false" />
+    <cache name="com.netshelter.ifbrands.data.entity.IfbSurveyQuestionTypeAnswer" maxEntriesLocalHeap="10000" eternal="false" timeToLiveSeconds="300" overflowToDisk="false" />
+    <cache name="com.netshelter.ifbrands.data.entity.IfbSurveyAnswer"           maxEntriesLocalHeap="10000" eternal="false" timeToLiveSeconds="300" overflowToDisk="false" />
+    <cache name="com.netshelter.ifbrands.data.entity.IfbSurveyResponse"         maxEntriesLocalHeap="10000" eternal="false" timeToLiveSeconds="300" overflowToDisk="false" />
+    <cache name="com.netshelter.ifbrands.data.entity.IfbSurveyResponseLog"      maxEntriesLocalHeap="10000" eternal="false" timeToLiveSeconds="300" overflowToDisk="false" />
+
+	<!-- User cache w/ 5m ttl -->
+	<cache name="ifb.mvc.user" maxElementsInMemory="1000" eternal="false" timeToLiveSeconds="600"
+		overflowToDisk="false" memoryStoreEvictionPolicy="LRU" />
+
+	<!-- Entity cache w/ 24h ttl -->
+	<cache name="ifb.mvc.entity" maxElementsInMemory="5000" eternal="false" timeToLiveSeconds="86400"
+		overflowToDisk="false" memoryStoreEvictionPolicy="LRU" />
+
+    <!-- Influence cache w/ 1h ttl -->
+    <cache name="ifb.mvc.influence" maxElementsInMemory="500" eternal="false"
+           timeToLiveSeconds="3600" overflowToDisk="false" memoryStoreEvictionPolicy="LRU"
+            />
+
+    <!-- Influence cache w/ 1h ttl -->
+    <cache name="ifb.mvc.notes" maxElementsInMemory="500" eternal="false"
+           timeToLiveSeconds="3600" overflowToDisk="false" memoryStoreEvictionPolicy="LRU"
+            />
+
+    <!-- Tracking services cache w/ 1h ttl -->
+    <cache name="ifb.mvc.tracking" maxElementsInMemory="5000" eternal="false"
+           timeToLiveSeconds="3600" overflowToDisk="false" memoryStoreEvictionPolicy="LRU"
+            />
+
+    <!-- UserManagement response cache w/ 1h ttl -->
+    <cache name="ifb.usermanagement" maxElementsInMemory="500" eternal="false"
+           timeToLiveSeconds="3600" overflowToDisk="false" memoryStoreEvictionPolicy="LRU"
+            />
+
+    <cache name="ifb.mvc.survey" maxElementsInMemory="10000" eternal="false"
+           timeToLiveSeconds="86400" overflowToDisk="false" memoryStoreEvictionPolicy="LRU"
+            />
+
+
+
+</ehcache> 
+    
