@@ -1,4 +1,4 @@
-inpowered_for_brands
+idealspoon Backend
 ====================
 
-InPowered for Brands front end and backend projects
+Backend API for inpowered for Brands.
