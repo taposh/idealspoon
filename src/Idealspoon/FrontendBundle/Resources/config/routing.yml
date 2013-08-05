@@ -1,0 +1,3 @@
+idealspoon_frontend_homepage:
+    pattern:  /
+    defaults: { _controller: IdealspoonFrontendBundle:Default:index }

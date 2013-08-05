@@ -1,0 +1,91 @@
+<?php
+
+namespace Idealspoon\ApiBundle\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+
+/**
+ * IspAddress
+ *
+ * @ORM\Table(name="isp_address")
+ * @ORM\Entity
+ */
+class IspAddress
+{
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="address_one", type="string", length=255, nullable=true)
+     */
+    private $addressOne;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="address_two", type="string", length=45, nullable=true)
+     */
+    private $addressTwo;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="city", type="string", length=45, nullable=true)
+     */
+    private $city;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="zip_code", type="string", length=45, nullable=true)
+     */
+    private $zipCode;
+
+    /**
+     * @var float
+     *
+     * @ORM\Column(name="latitude", type="decimal", nullable=true)
+     */
+    private $latitude;
+
+    /**
+     * @var float
+     *
+     * @ORM\Column(name="longitude", type="decimal", nullable=true)
+     */
+    private $longitude;
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="id", type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="IDENTITY")
+     */
+    private $id;
+
+    /**
+     * @var \Idealspoon\ApiBundle\Entity\IspState
+     *
+     * @ORM\ManyToOne(targetEntity="Idealspoon\ApiBundle\Entity\IspState")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="state_id", referencedColumnName="id")
+     * })
+     */
+    private $state;
+
+    /**
+     * @var \Doctrine\Common\Collections\Collection
+     *
+     * @ORM\ManyToMany(targetEntity="Idealspoon\ApiBundle\Entity\IspRestaurant", mappedBy="address")
+     */
+    private $restaurant;
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->restaurant = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+    
+}

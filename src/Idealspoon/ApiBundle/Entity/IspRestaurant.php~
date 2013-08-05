@@ -1,0 +1,86 @@
+<?php
+
+namespace Idealspoon\ApiBundle\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+
+/**
+ * IspRestaurant
+ *
+ * @ORM\Table(name="isp_restaurant")
+ * @ORM\Entity
+ */
+class IspRestaurant
+{
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="name", type="string", length=45, nullable=true)
+     */
+    private $name;
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="id", type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="IDENTITY")
+     */
+    private $id;
+
+    /**
+     * @var \Doctrine\Common\Collections\Collection
+     *
+     * @ORM\ManyToMany(targetEntity="Idealspoon\ApiBundle\Entity\IspCusine", inversedBy="restaurant")
+     * @ORM\JoinTable(name="isp_restaurant_cusine",
+     *   joinColumns={
+     *     @ORM\JoinColumn(name="restaurant_id", referencedColumnName="id")
+     *   },
+     *   inverseJoinColumns={
+     *     @ORM\JoinColumn(name="cusine_id", referencedColumnName="id")
+     *   }
+     * )
+     */
+    private $cusine;
+
+    /**
+     * @var \Doctrine\Common\Collections\Collection
+     *
+     * @ORM\ManyToMany(targetEntity="Idealspoon\ApiBundle\Entity\IspAmbience", inversedBy="restaurant")
+     * @ORM\JoinTable(name="isp_restaurant_ambience",
+     *   joinColumns={
+     *     @ORM\JoinColumn(name="restaurant_id", referencedColumnName="id")
+     *   },
+     *   inverseJoinColumns={
+     *     @ORM\JoinColumn(name="ambience_id", referencedColumnName="id")
+     *   }
+     * )
+     */
+    private $ambience;
+
+    /**
+     * @var \Doctrine\Common\Collections\Collection
+     *
+     * @ORM\ManyToMany(targetEntity="Idealspoon\ApiBundle\Entity\IspAddress", inversedBy="restaurant")
+     * @ORM\JoinTable(name="isp_restaurant_address",
+     *   joinColumns={
+     *     @ORM\JoinColumn(name="restaurant_id", referencedColumnName="id")
+     *   },
+     *   inverseJoinColumns={
+     *     @ORM\JoinColumn(name="address_id", referencedColumnName="id")
+     *   }
+     * )
+     */
+    private $address;
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->cusine = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->ambience = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->address = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+    
+}

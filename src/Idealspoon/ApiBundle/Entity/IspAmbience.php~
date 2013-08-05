@@ -1,0 +1,53 @@
+<?php
+
+namespace Idealspoon\ApiBundle\Entity;
+
+use Doctrine\ORM\Mapping as ORM;
+
+/**
+ * IspAmbience
+ *
+ * @ORM\Table(name="isp_ambience")
+ * @ORM\Entity
+ */
+class IspAmbience
+{
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="name", type="string", length=45, nullable=true)
+     */
+    private $name;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="dscr", type="string", length=45, nullable=true)
+     */
+    private $dscr;
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="id", type="integer")
+     * @ORM\Id
+     * @ORM\GeneratedValue(strategy="IDENTITY")
+     */
+    private $id;
+
+    /**
+     * @var \Doctrine\Common\Collections\Collection
+     *
+     * @ORM\ManyToMany(targetEntity="Idealspoon\ApiBundle\Entity\IspRestaurant", mappedBy="ambience")
+     */
+    private $restaurant;
+
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->restaurant = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+    
+}

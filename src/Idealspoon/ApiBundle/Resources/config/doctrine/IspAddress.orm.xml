@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping http://doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+  <entity name="Idealspoon\ApiBundle\Entity\IspAddress" table="isp_address">
+    <id name="id" type="integer" column="id">
+      <generator strategy="IDENTITY"/>
+    </id>
+    <field name="addressOne" type="string" column="address_one" length="255" nullable="true"/>
+    <field name="addressTwo" type="string" column="address_two" length="45" nullable="true"/>
+    <field name="city" type="string" column="city" length="45" nullable="true"/>
+    <field name="zipCode" type="string" column="zip_code" length="45" nullable="true"/>
+    <field name="latitude" type="decimal" column="latitude" nullable="true"/>
+    <field name="longitude" type="decimal" column="longitude" nullable="true"/>
+    <many-to-one field="state" target-entity="IspState">
+      <join-columns>
+        <join-column name="state_id" referenced-column-name="id"/>
+      </join-columns>
+    </many-to-one>
+    <many-to-many field="restaurant" target-entity="IspRestaurant" mapped-by="address"/>
+  </entity>
+</doctrine-mapping>
