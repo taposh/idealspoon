@@ -20,6 +20,13 @@ class IspRestaurant
     private $name;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="rating", type="string", length=45, nullable=true)
+     */
+    private $rating;
+
+    /**
      * @var integer
      *
      * @ORM\Column(name="id", type="integer")
@@ -105,6 +112,29 @@ class IspRestaurant
     public function getName()
     {
         return $this->name;
+    }
+
+    /**
+     * Set rating
+     *
+     * @param string $rating
+     * @return IspRestaurant
+     */
+    public function setRating($rating)
+    {
+        $this->rating = $rating;
+    
+        return $this;
+    }
+
+    /**
+     * Get rating
+     *
+     * @return string 
+     */
+    public function getRating()
+    {
+        return $this->rating;
     }
 
     /**

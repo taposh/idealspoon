@@ -178,6 +178,17 @@ class appDevUrlMatcher extends Symfony\Bundle\FrameworkBundle\Routing\Redirectab
             }
             not_get_metadata:
 
+            // get_location
+            if (0 === strpos($pathinfo, '/api/v1/location') && preg_match('#^/api/v1/location(?:\\.(?P<_format>json|xml|html))?$#s', $pathinfo, $matches)) {
+                if (!in_array($this->context->getMethod(), array('GET', 'HEAD'))) {
+                    $allow = array_merge($allow, array('GET', 'HEAD'));
+                    goto not_get_location;
+                }
+
+                return $this->mergeDefaults(array_replace($matches, array('_route' => 'get_location')), array (  '_controller' => 'Idealspoon\\ApiBundle\\Controller\\RestaurantController::getLocationAction',  '_format' => NULL,));
+            }
+            not_get_location:
+
         }
 
         if (0 === strpos($pathinfo, '/log')) {

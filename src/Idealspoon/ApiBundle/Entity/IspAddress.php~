@@ -55,6 +55,20 @@ class IspAddress
     private $longitude;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="phone", type="string", length=45, nullable=true)
+     */
+    private $phone;
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="status", type="integer", nullable=true)
+     */
+    private $status;
+
+    /**
      * @var integer
      *
      * @ORM\Column(name="id", type="integer")

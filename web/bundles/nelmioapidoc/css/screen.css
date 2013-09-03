@@ -116,6 +116,12 @@ pre {
 table.fullwidth {
   width: 100%;
 }
+table.fullwidth > tbody > tr {
+  border-bottom: 1px solid #cccccc;
+}
+table.fullwidth > tbody tr:last-child {
+  border-bottom: none;
+}
 table thead tr th {
   padding: 5px;
   font-size: 0.9em;
@@ -125,12 +131,8 @@ table thead tr th {
 table tbody tr td {
   padding: 6px;
   font-size: 0.9em;
-  border-bottom: 1px solid #cccccc;
   vertical-align: top;
   line-height: 1.3em;
-}
-table tbody tr:last-child td {
-  border-bottom: none;
 }
 
 #header {
@@ -538,11 +540,19 @@ li.operation.unlink div.content h4 {
   display: none;
 }
 
-form .parameters,
+form .parameters {
+  float: left;
+  width: 50%;
+}
+
+form .parameters .tuple input {
+	width: 40%;
+}
+
 form .headers,
 form .request-content {
   float: left;
-  width: 33%;
+  width: 25%;
 }
 
 .buttons {

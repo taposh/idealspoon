@@ -10,6 +10,8 @@
     <field name="zipCode" type="string" column="zip_code" length="45" nullable="true"/>
     <field name="latitude" type="decimal" column="latitude" nullable="true"/>
     <field name="longitude" type="decimal" column="longitude" nullable="true"/>
+    <field name="phone" type="string" column="phone" length="45" nullable="true"/>
+    <field name="status" type="integer" column="status" nullable="true"/>
     <many-to-one field="state" target-entity="IspState">
       <join-columns>
         <join-column name="state_id" referenced-column-name="id"/>

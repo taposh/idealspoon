@@ -24,7 +24,8 @@
         "nelmio/api-doc-bundle": "dev-master",
         "friendsofsymfony/user-bundle": "~2.0@dev",
         "escapestudios/wsse-authentication-bundle": "2.3.x-dev",
-        "sonata-project/admin-bundle": "master-dev"
+        "sonata-project/admin-bundle": "master-dev",
+        "willdurand/geocoder": "*"
     },
     "scripts": {
         "post-install-cmd": [

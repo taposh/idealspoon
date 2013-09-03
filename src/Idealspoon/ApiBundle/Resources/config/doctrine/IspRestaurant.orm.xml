@@ -5,6 +5,7 @@
       <generator strategy="IDENTITY"/>
     </id>
     <field name="name" type="string" column="name" length="45" nullable="true"/>
+    <field name="rating" type="string" column="rating" length="45" nullable="true"/>
     <many-to-many field="cusine" target-entity="IspCusine" inversed-by="restaurant">
       <join-table name="isp_restaurant_cusine">
         <join-columns>

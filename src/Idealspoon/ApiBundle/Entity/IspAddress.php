@@ -55,6 +55,20 @@ class IspAddress
     private $longitude;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="phone", type="string", length=45, nullable=true)
+     */
+    private $phone;
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="status", type="integer", nullable=true)
+     */
+    private $status;
+
+    /**
      * @var integer
      *
      * @ORM\Column(name="id", type="integer")
@@ -225,6 +239,52 @@ class IspAddress
     public function getLongitude()
     {
         return $this->longitude;
+    }
+
+    /**
+     * Set phone
+     *
+     * @param string $phone
+     * @return IspAddress
+     */
+    public function setPhone($phone)
+    {
+        $this->phone = $phone;
+    
+        return $this;
+    }
+
+    /**
+     * Get phone
+     *
+     * @return string 
+     */
+    public function getPhone()
+    {
+        return $this->phone;
+    }
+
+    /**
+     * Set status
+     *
+     * @param integer $status
+     * @return IspAddress
+     */
+    public function setStatus($status)
+    {
+        $this->status = $status;
+    
+        return $this;
+    }
+
+    /**
+     * Get status
+     *
+     * @return integer 
+     */
+    public function getStatus()
+    {
+        return $this->status;
     }
 
     /**
