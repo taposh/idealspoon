@@ -1,8 +1,8 @@
-CREATE DATABASE  IF NOT EXISTS `ispoondb_new` /*!40100 DEFAULT CHARACTER SET utf8 */;
-USE `ispoondb_new`;
+CREATE DATABASE  IF NOT EXISTS `ispoondb` /*!40100 DEFAULT CHARACTER SET utf8 */;
+USE `ispoondb`;
 -- MySQL dump 10.13  Distrib 5.5.32, for debian-linux-gnu (i686)
 --
--- Host: 127.0.0.1    Database: ispoondb_new
+-- Host: 127.0.0.1    Database: ispoondb
 -- ------------------------------------------------------
 -- Server version	5.5.32-0ubuntu0.12.04.1
 
