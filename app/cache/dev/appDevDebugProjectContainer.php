@@ -114,6 +114,7 @@ class appDevDebugProjectContainer extends Container
             'form.type_extension.submit.validator' => 'getForm_TypeExtension_Submit_ValidatorService',
             'form.type_guesser.doctrine' => 'getForm_TypeGuesser_DoctrineService',
             'form.type_guesser.validator' => 'getForm_TypeGuesser_ValidatorService',
+            'fos_rest.access_denied_listener' => 'getFosRest_AccessDeniedListenerService',
             'fos_rest.body_listener' => 'getFosRest_BodyListenerService',
             'fos_rest.decoder.json' => 'getFosRest_Decoder_JsonService',
             'fos_rest.decoder.jsontoform' => 'getFosRest_Decoder_JsontoformService',
@@ -122,6 +123,7 @@ class appDevDebugProjectContainer extends Container
             'fos_rest.format_listener' => 'getFosRest_FormatListenerService',
             'fos_rest.format_negotiator' => 'getFosRest_FormatNegotiatorService',
             'fos_rest.inflector.doctrine' => 'getFosRest_Inflector_DoctrineService',
+            'fos_rest.mime_type_listener' => 'getFosRest_MimeTypeListenerService',
             'fos_rest.request.param_fetcher' => 'getFosRest_Request_ParamFetcherService',
             'fos_rest.request.param_fetcher.reader' => 'getFosRest_Request_ParamFetcher_ReaderService',
             'fos_rest.routing.loader.controller' => 'getFosRest_Routing_Loader_ControllerService',
@@ -621,7 +623,7 @@ class appDevDebugProjectContainer extends Container
         $c = new \Symfony\Bridge\Doctrine\ContainerAwareEventManager($this);
         $c->addEventSubscriber(new \FOS\UserBundle\Doctrine\Orm\UserListener($this));
 
-        return $this->services['doctrine.dbal.default_connection'] = $this->get('doctrine.dbal.connection_factory')->createConnection(array('dbname' => 'ispoondb_new', 'host' => '127.0.0.1', 'port' => NULL, 'user' => 'root', 'password' => 'root', 'charset' => 'UTF8', 'driver' => 'pdo_mysql', 'driverOptions' => array()), $b, $c, array());
+        return $this->services['doctrine.dbal.default_connection'] = $this->get('doctrine.dbal.connection_factory')->createConnection(array('dbname' => 'ispoondb', 'host' => '127.0.0.1', 'port' => NULL, 'user' => 'root', 'password' => 'root', 'charset' => 'UTF8', 'driver' => 'pdo_mysql', 'driverOptions' => array()), $b, $c, array());
     }
 
     /**
@@ -808,6 +810,7 @@ class appDevDebugProjectContainer extends Container
         $instance->addListenerService('kernel.view', array(0 => 'fos_rest.view_response_listener', 1 => 'onKernelView'), 100);
         $instance->addListenerService('kernel.request', array(0 => 'fos_rest.body_listener', 1 => 'onKernelRequest'), 0);
         $instance->addListenerService('kernel.controller', array(0 => 'fos_rest.format_listener', 1 => 'onKernelController'), 0);
+        $instance->addListenerService('kernel.request', array(0 => 'fos_rest.mime_type_listener', 1 => 'onKernelRequest'), 200);
         $instance->addListenerService('kernel.request', array(0 => 'nelmio_api_doc.event_listener.request', 1 => 'onKernelRequest'), 0);
         $instance->addListenerService('kernel.controller', array(0 => 'acme.demo.listener', 1 => 'onKernelController'), 0);
         $instance->addSubscriberService('response_listener', 'Symfony\\Component\\HttpKernel\\EventListener\\ResponseListener');
@@ -827,6 +830,7 @@ class appDevDebugProjectContainer extends Container
         $instance->addSubscriberService('sensio_framework_extra.controller.listener', 'Sensio\\Bundle\\FrameworkExtraBundle\\EventListener\\ControllerListener');
         $instance->addSubscriberService('sensio_framework_extra.converter.listener', 'Sensio\\Bundle\\FrameworkExtraBundle\\EventListener\\ParamConverterListener');
         $instance->addSubscriberService('sensio_framework_extra.cache.listener', 'Sensio\\Bundle\\FrameworkExtraBundle\\EventListener\\CacheListener');
+        $instance->addSubscriberService('fos_rest.access_denied_listener', 'FOS\\RestBundle\\EventListener\\AccessDeniedListener');
         $instance->addSubscriberService('fos_user.security.interactive_login_listener', 'FOS\\UserBundle\\EventListener\\LastLoginListener');
         $instance->addSubscriberService('fos_user.listener.authentication', 'FOS\\UserBundle\\EventListener\\AuthenticationListener');
         $instance->addSubscriberService('fos_user.listener.flash', 'FOS\\UserBundle\\EventListener\\FlashListener');
@@ -1409,6 +1413,19 @@ class appDevDebugProjectContainer extends Container
     }
 
     /**
+     * Gets the 'fos_rest.access_denied_listener' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return FOS\RestBundle\EventListener\AccessDeniedListener A FOS\RestBundle\EventListener\AccessDeniedListener instance.
+     */
+    protected function getFosRest_AccessDeniedListenerService()
+    {
+        return $this->services['fos_rest.access_denied_listener'] = new \FOS\RestBundle\EventListener\AccessDeniedListener(array('json' => true), 'FOS\\RestBundle\\Controller\\ExceptionController::showAction', $this->get('monolog.logger.request', ContainerInterface::NULL_ON_INVALID_REFERENCE));
+    }
+
+    /**
      * Gets the 'fos_rest.body_listener' service.
      *
      * This service is shared.
@@ -1517,6 +1534,19 @@ class appDevDebugProjectContainer extends Container
     }
 
     /**
+     * Gets the 'fos_rest.mime_type_listener' service.
+     *
+     * This service is shared.
+     * This method always returns the same instance of the service.
+     *
+     * @return FOS\RestBundle\EventListener\MimeTypeListener A FOS\RestBundle\EventListener\MimeTypeListener instance.
+     */
+    protected function getFosRest_MimeTypeListenerService()
+    {
+        return $this->services['fos_rest.mime_type_listener'] = new \FOS\RestBundle\EventListener\MimeTypeListener(array('json' => array(0 => 'application/json', 1 => 'application/x-json', 2 => 'application/vnd.example-com.foo+json'), 'rss' => 'application/rss+xml', 'jpg' => 'image/jpeg', 'png' => 'image/png', 'jsonp' => 'application/javascript'), $this->get('fos_rest.format_negotiator'));
+    }
+
+    /**
      * Gets the 'fos_rest.request.param_fetcher' service.
      *
      * This service is shared.
@@ -1584,7 +1614,7 @@ class appDevDebugProjectContainer extends Container
      */
     protected function getFosRest_Routing_Loader_Reader_ActionService()
     {
-        return $this->services['fos_rest.routing.loader.reader.action'] = new \FOS\RestBundle\Routing\Loader\Reader\RestActionReader($this->get('annotation_reader'), $this->get('fos_rest.request.param_fetcher.reader'), $this->get('fos_rest.inflector.doctrine'), true, array('json' => false, 'xml' => false, 'html' => true));
+        return $this->services['fos_rest.routing.loader.reader.action'] = new \FOS\RestBundle\Routing\Loader\Reader\RestActionReader($this->get('annotation_reader'), $this->get('fos_rest.request.param_fetcher.reader'), $this->get('fos_rest.inflector.doctrine'), true, array('jsonp' => false, 'json' => true, 'xml' => false));
     }
 
     /**
@@ -1636,9 +1666,10 @@ class appDevDebugProjectContainer extends Container
      */
     protected function getFosRest_ViewHandlerService()
     {
-        $this->services['fos_rest.view_handler'] = $instance = new \FOS\RestBundle\View\ViewHandler(array('json' => false, 'xml' => false, 'html' => true), 400, 204, false, array('html' => 302), 'twig');
+        $this->services['fos_rest.view_handler'] = $instance = new \FOS\RestBundle\View\ViewHandler(array('jsonp' => false, 'json' => true, 'xml' => false), 400, 204, false, array('html' => 302), 'twig');
 
         $instance->setContainer($this);
+        $instance->registerHandler('jsonp', array(0 => new \FOS\RestBundle\View\JsonpHandler('callback', '/(^[a-z0-9_]+$)|(^YUI\\.Env\\.JSONP\\._[0-9]+$)/i'), 1 => 'createResponse'));
 
         return $instance;
     }
@@ -2878,7 +2909,7 @@ class appDevDebugProjectContainer extends Container
         $g = new \Symfony\Component\Security\Http\Authentication\DefaultAuthenticationSuccessHandler($d, array('always_use_default_target_path' => false, 'default_target_path' => '/', 'login_path' => '/login', 'target_path_parameter' => '_target_path', 'use_referer' => false));
         $g->setProviderKey('main');
 
-        return $this->services['security.firewall.map.context.main'] = new \Symfony\Bundle\SecurityBundle\Security\FirewallContext(array(0 => $this->get('security.channel_listener'), 1 => new \Symfony\Component\Security\Http\Firewall\ContextListener($a, array(0 => $this->get('fos_user.user_provider.username')), 'main', $b, $c), 2 => $f, 3 => new \Symfony\Component\Security\Http\Firewall\UsernamePasswordFormAuthenticationListener($a, $this->get('security.authentication.manager'), $this->get('security.authentication.session_strategy'), $d, 'main', $g, new \Symfony\Component\Security\Http\Authentication\DefaultAuthenticationFailureHandler($e, $d, array('login_path' => '/login', 'failure_path' => NULL, 'failure_forward' => false, 'failure_path_parameter' => '_failure_path'), $b), array('check_path' => '/login_check', 'use_forward' => false, 'require_previous_session' => true, 'username_parameter' => '_username', 'password_parameter' => '_password', 'csrf_parameter' => '_csrf_token', 'intention' => 'authenticate', 'post_only' => true), $b, $c, $this->get('form.csrf_provider')), 4 => new \Symfony\Component\Security\Http\Firewall\AnonymousAuthenticationListener($a, '5223fd7ff0a79', $b), 5 => $this->get('security.access_listener')), new \Symfony\Component\Security\Http\Firewall\ExceptionListener($a, $this->get('security.authentication.trust_resolver'), $d, 'main', new \Symfony\Component\Security\Http\EntryPoint\FormAuthenticationEntryPoint($e, $d, '/login', false), NULL, NULL, $b));
+        return $this->services['security.firewall.map.context.main'] = new \Symfony\Bundle\SecurityBundle\Security\FirewallContext(array(0 => $this->get('security.channel_listener'), 1 => new \Symfony\Component\Security\Http\Firewall\ContextListener($a, array(0 => $this->get('fos_user.user_provider.username')), 'main', $b, $c), 2 => $f, 3 => new \Symfony\Component\Security\Http\Firewall\UsernamePasswordFormAuthenticationListener($a, $this->get('security.authentication.manager'), $this->get('security.authentication.session_strategy'), $d, 'main', $g, new \Symfony\Component\Security\Http\Authentication\DefaultAuthenticationFailureHandler($e, $d, array('login_path' => '/login', 'failure_path' => NULL, 'failure_forward' => false, 'failure_path_parameter' => '_failure_path'), $b), array('check_path' => '/login_check', 'use_forward' => false, 'require_previous_session' => true, 'username_parameter' => '_username', 'password_parameter' => '_password', 'csrf_parameter' => '_csrf_token', 'intention' => 'authenticate', 'post_only' => true), $b, $c, $this->get('form.csrf_provider')), 4 => new \Symfony\Component\Security\Http\Firewall\AnonymousAuthenticationListener($a, '522cc145baa3b', $b), 5 => $this->get('security.access_listener')), new \Symfony\Component\Security\Http\Firewall\ExceptionListener($a, $this->get('security.authentication.trust_resolver'), $d, 'main', new \Symfony\Component\Security\Http\EntryPoint\FormAuthenticationEntryPoint($e, $d, '/login', false), NULL, NULL, $b));
     }
 
     /**
@@ -2894,7 +2925,7 @@ class appDevDebugProjectContainer extends Container
         $a = $this->get('security.context');
         $b = $this->get('monolog.logger.security', ContainerInterface::NULL_ON_INVALID_REFERENCE);
 
-        return $this->services['security.firewall.map.context.wsse_secured'] = new \Symfony\Bundle\SecurityBundle\Security\FirewallContext(array(0 => $this->get('security.channel_listener'), 1 => $this->get('escape_wsse_authentication.listener.wsse_secured'), 2 => new \Symfony\Component\Security\Http\Firewall\AnonymousAuthenticationListener($a, '5223fd7ff0a79', $b), 3 => $this->get('security.access_listener')), new \Symfony\Component\Security\Http\Firewall\ExceptionListener($a, $this->get('security.authentication.trust_resolver'), $this->get('security.http_utils'), 'wsse_secured', $this->get('escape_wsse_authentication.entry_point.wsse_secured'), NULL, NULL, $b));
+        return $this->services['security.firewall.map.context.wsse_secured'] = new \Symfony\Bundle\SecurityBundle\Security\FirewallContext(array(0 => $this->get('security.channel_listener'), 1 => $this->get('escape_wsse_authentication.listener.wsse_secured'), 2 => new \Symfony\Component\Security\Http\Firewall\AnonymousAuthenticationListener($a, '522cc145baa3b', $b), 3 => $this->get('security.access_listener')), new \Symfony\Component\Security\Http\Firewall\ExceptionListener($a, $this->get('security.authentication.trust_resolver'), $this->get('security.http_utils'), 'wsse_secured', $this->get('escape_wsse_authentication.entry_point.wsse_secured'), NULL, NULL, $b));
     }
 
     /**
@@ -3845,7 +3876,7 @@ class appDevDebugProjectContainer extends Container
      */
     protected function getTwigService()
     {
-        $this->services['twig'] = $instance = new \Twig_Environment($this->get('twig.loader'), array('debug' => true, 'strict_variables' => true, 'exception_controller' => 'twig.controller.exception:showAction', 'autoescape_service' => NULL, 'autoescape_service_method' => NULL, 'cache' => '/home/jason/projects/idealspoon/app/cache/dev/twig', 'charset' => 'UTF-8', 'paths' => array()));
+        $this->services['twig'] = $instance = new \Twig_Environment($this->get('twig.loader'), array('exception_controller' => 'FOS\\RestBundle\\Controller\\ExceptionController::showAction', 'debug' => true, 'strict_variables' => true, 'autoescape_service' => NULL, 'autoescape_service_method' => NULL, 'cache' => '/home/jason/projects/idealspoon/app/cache/dev/twig', 'charset' => 'UTF-8', 'paths' => array()));
 
         $instance->addExtension(new \Symfony\Bundle\SecurityBundle\Twig\Extension\LogoutUrlExtension($this->get('templating.helper.logout_url')));
         $instance->addExtension(new \Symfony\Bridge\Twig\Extension\SecurityExtension($this->get('security.context', ContainerInterface::NULL_ON_INVALID_REFERENCE)));
@@ -3891,7 +3922,7 @@ class appDevDebugProjectContainer extends Container
      */
     protected function getTwig_ExceptionListenerService()
     {
-        return $this->services['twig.exception_listener'] = new \Symfony\Component\HttpKernel\EventListener\ExceptionListener('twig.controller.exception:showAction', $this->get('monolog.logger.request', ContainerInterface::NULL_ON_INVALID_REFERENCE));
+        return $this->services['twig.exception_listener'] = new \Symfony\Component\HttpKernel\EventListener\ExceptionListener('FOS\\RestBundle\\Controller\\ExceptionController::showAction', $this->get('monolog.logger.request', ContainerInterface::NULL_ON_INVALID_REFERENCE));
     }
 
     /**
@@ -4264,7 +4295,7 @@ class appDevDebugProjectContainer extends Container
      */
     protected function getSecurity_Authentication_ManagerService()
     {
-        $this->services['security.authentication.manager'] = $instance = new \Symfony\Component\Security\Core\Authentication\AuthenticationProviderManager(array(0 => $this->get('escape_wsse_authentication.provider.wsse_secured'), 1 => new \Symfony\Component\Security\Core\Authentication\Provider\AnonymousAuthenticationProvider('5223fd7ff0a79'), 2 => new \Symfony\Component\Security\Core\Authentication\Provider\DaoAuthenticationProvider($this->get('fos_user.user_provider.username'), $this->get('security.user_checker'), 'main', $this->get('security.encoder_factory'), true), 3 => new \Symfony\Component\Security\Core\Authentication\Provider\AnonymousAuthenticationProvider('5223fd7ff0a79')), true);
+        $this->services['security.authentication.manager'] = $instance = new \Symfony\Component\Security\Core\Authentication\AuthenticationProviderManager(array(0 => $this->get('escape_wsse_authentication.provider.wsse_secured'), 1 => new \Symfony\Component\Security\Core\Authentication\Provider\AnonymousAuthenticationProvider('522cc145baa3b'), 2 => new \Symfony\Component\Security\Core\Authentication\Provider\DaoAuthenticationProvider($this->get('fos_user.user_provider.username'), $this->get('security.user_checker'), 'main', $this->get('security.encoder_factory'), true), 3 => new \Symfony\Component\Security\Core\Authentication\Provider\AnonymousAuthenticationProvider('522cc145baa3b')), true);
 
         $instance->setEventDispatcher($this->get('event_dispatcher'));
 
@@ -4497,7 +4528,7 @@ class appDevDebugProjectContainer extends Container
             'kernel.root_dir' => '/home/jason/projects/idealspoon/app',
             'kernel.environment' => 'dev',
             'kernel.debug' => true,
-            'kernel.name' => 'ap_',
+            'kernel.name' => 'app',
             'kernel.cache_dir' => '/home/jason/projects/idealspoon/app/cache/dev',
             'kernel.logs_dir' => '/home/jason/projects/idealspoon/app/logs',
             'kernel.bundles' => array(
@@ -4526,7 +4557,7 @@ class appDevDebugProjectContainer extends Container
             'database_driver' => 'pdo_mysql',
             'database_host' => '127.0.0.1',
             'database_port' => NULL,
-            'database_name' => 'ispoondb_new',
+            'database_name' => 'ispoondb',
             'database_user' => 'root',
             'database_password' => 'root',
             'mailer_transport' => 'smtp',
@@ -4805,15 +4836,15 @@ class appDevDebugProjectContainer extends Container
             'twig.translation.extractor.class' => 'Symfony\\Bridge\\Twig\\Translation\\TwigExtractor',
             'twig.exception_listener.class' => 'Symfony\\Component\\HttpKernel\\EventListener\\ExceptionListener',
             'twig.controller.exception.class' => 'Symfony\\Bundle\\TwigBundle\\Controller\\ExceptionController',
-            'twig.exception_listener.controller' => 'twig.controller.exception:showAction',
+            'twig.exception_listener.controller' => 'FOS\\RestBundle\\Controller\\ExceptionController::showAction',
             'twig.form.resources' => array(
                 0 => 'form_div_layout.html.twig',
             ),
             'debug.templating.engine.twig.class' => 'Symfony\\Bundle\\TwigBundle\\Debug\\TimedTwigEngine',
             'twig.options' => array(
+                'exception_controller' => 'FOS\\RestBundle\\Controller\\ExceptionController::showAction',
                 'debug' => true,
                 'strict_variables' => true,
-                'exception_controller' => 'twig.controller.exception:showAction',
                 'autoescape_service' => NULL,
                 'autoescape_service_method' => NULL,
                 'cache' => '/home/jason/projects/idealspoon/app/cache/dev/twig',
@@ -5031,8 +5062,8 @@ class appDevDebugProjectContainer extends Container
             'jms_serializer.doctrine_proxy_subscriber.class' => 'JMS\\Serializer\\EventDispatcher\\Subscriber\\DoctrineProxySubscriber',
             'fos_rest.serializer.exclusion_strategy.version' => '',
             'fos_rest.serializer.exclusion_strategy.groups' => '',
-            'fos_rest.view_handler.jsonp.callback_param' => '',
-            'fos_rest.view_handler.jsonp.callback_filter' => '',
+            'fos_rest.view_handler.jsonp.callback_param' => 'callback',
+            'fos_rest.view_handler.jsonp.callback_filter' => '/(^[a-z0-9_]+$)|(^YUI\\.Env\\.JSONP\\._[0-9]+$)/i',
             'fos_rest.routing.loader.controller.class' => 'FOS\\RestBundle\\Routing\\Loader\\RestRouteLoader',
             'fos_rest.routing.loader.yaml_collection.class' => 'FOS\\RestBundle\\Routing\\Loader\\RestYamlCollectionLoader',
             'fos_rest.routing.loader.xml_collection.class' => 'FOS\\RestBundle\\Routing\\Loader\\RestXmlCollectionLoader',
@@ -5046,9 +5077,9 @@ class appDevDebugProjectContainer extends Container
             'fos_rest.cache_dir' => '/home/jason/projects/idealspoon/app/cache/dev/fos_rest',
             'fos_rest.serializer.serialize_null' => false,
             'fos_rest.formats' => array(
-                'json' => false,
+                'jsonp' => false,
+                'json' => true,
                 'xml' => false,
-                'html' => true,
             ),
             'fos_rest.default_engine' => 'twig',
             'fos_rest.force_redirects' => array(
@@ -5057,11 +5088,12 @@ class appDevDebugProjectContainer extends Container
             'fos_rest.failed_validation' => 400,
             'fos_rest.empty_content' => 204,
             'fos_rest.serialize_null' => false,
-            'fos_rest.view_response_listener.force_view' => false,
+            'fos_rest.view_response_listener.force_view' => true,
             'fos_rest.routing.loader.default_format' => NULL,
             'fos_rest.routing.loader.include_format' => true,
             'fos_rest.exception.codes' => array(
-
+                'Symfony\\Component\\Routing\\Exception\\ResourceNotFoundException' => 404,
+                'Doctrine\\ORM\\OptimisticLockException' => 409,
             ),
             'fos_rest.exception.messages' => array(
 
@@ -5077,7 +5109,19 @@ class appDevDebugProjectContainer extends Container
             'fos_rest.prefer_extension' => false,
             'fos_rest.fallback_format' => 'html',
             'fos_rest.mime_types' => array(
-
+                'json' => array(
+                    0 => 'application/json',
+                    1 => 'application/x-json',
+                    2 => 'application/vnd.example-com.foo+json',
+                ),
+                'rss' => 'application/rss+xml',
+                'jpg' => 'image/jpeg',
+                'png' => 'image/png',
+                'jsonp' => 'application/javascript',
+            ),
+            'fos_rest.access_denied_listener.class' => 'FOS\\RestBundle\\EventListener\\AccessDeniedListener',
+            'fos_rest.access_denied_listener.formats' => array(
+                'json' => true,
             ),
             'fos_rest.converter.request_body.validation_errors_argument' => 'validationErrors',
             'nelmio_api_doc.motd.template' => 'NelmioApiDocBundle::Components/motd.html.twig',

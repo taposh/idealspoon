@@ -157,7 +157,7 @@ class appDevUrlMatcher extends Symfony\Bundle\FrameworkBundle\Routing\Redirectab
 
         if (0 === strpos($pathinfo, '/api/v1')) {
             // get_restaurants
-            if (0 === strpos($pathinfo, '/api/v1/restaurants') && preg_match('#^/api/v1/restaurants(?:\\.(?P<_format>json|xml|html))?$#s', $pathinfo, $matches)) {
+            if (0 === strpos($pathinfo, '/api/v1/restaurants') && preg_match('#^/api/v1/restaurants(?:\\.(?P<_format>jsonp|json|xml))?$#s', $pathinfo, $matches)) {
                 if (!in_array($this->context->getMethod(), array('GET', 'HEAD'))) {
                     $allow = array_merge($allow, array('GET', 'HEAD'));
                     goto not_get_restaurants;
@@ -168,7 +168,7 @@ class appDevUrlMatcher extends Symfony\Bundle\FrameworkBundle\Routing\Redirectab
             not_get_restaurants:
 
             // get_metadata
-            if (0 === strpos($pathinfo, '/api/v1/metadata') && preg_match('#^/api/v1/metadata(?:\\.(?P<_format>json|xml|html))?$#s', $pathinfo, $matches)) {
+            if (0 === strpos($pathinfo, '/api/v1/metadata') && preg_match('#^/api/v1/metadata(?:\\.(?P<_format>jsonp|json|xml))?$#s', $pathinfo, $matches)) {
                 if (!in_array($this->context->getMethod(), array('GET', 'HEAD'))) {
                     $allow = array_merge($allow, array('GET', 'HEAD'));
                     goto not_get_metadata;
@@ -179,7 +179,7 @@ class appDevUrlMatcher extends Symfony\Bundle\FrameworkBundle\Routing\Redirectab
             not_get_metadata:
 
             // get_location
-            if (0 === strpos($pathinfo, '/api/v1/location') && preg_match('#^/api/v1/location(?:\\.(?P<_format>json|xml|html))?$#s', $pathinfo, $matches)) {
+            if (0 === strpos($pathinfo, '/api/v1/location') && preg_match('#^/api/v1/location(?:\\.(?P<_format>jsonp|json|xml))?$#s', $pathinfo, $matches)) {
                 if (!in_array($this->context->getMethod(), array('GET', 'HEAD'))) {
                     $allow = array_merge($allow, array('GET', 'HEAD'));
                     goto not_get_location;

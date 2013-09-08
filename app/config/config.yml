@@ -24,7 +24,7 @@ framework:
 twig:
     debug:            %kernel.debug%
     strict_variables: %kernel.debug%
-
+    exception_controller: 'FOS\RestBundle\Controller\ExceptionController::showAction'
 # Assetic Configuration
 assetic:
     debug:          %kernel.debug%
@@ -71,9 +71,30 @@ sensio_framework_extra:
 fos_rest:
     format_listener:
         prefer_extension: false
+    access_denied_listener:
+        json: true
     view:
-        view_response_listener: true
-
+        view_response_listener: force
+        force_redirects:
+          html: true
+        formats:
+            jsonp: true
+            json: true
+            xml: true
+            rss: false
+        templating_formats:
+            json: true
+        mime_types:
+            json: ['application/json', 'application/x-json', 'application/vnd.example-com.foo+json']
+            rss: 'application/rss+xml'
+            jpg: 'image/jpeg'
+            png: 'image/png'
+        jsonp_handler: ~
+    exception:
+        codes:
+            'Symfony\Component\Routing\Exception\ResourceNotFoundException': 404
+            'Doctrine\ORM\OptimisticLockException': HTTP_CONFLICT
+        
 fos_user:
     db_driver: orm # other valid values are 'mongodb', 'couchdb' and 'propel'
     firewall_name: main

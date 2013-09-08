@@ -140,6 +140,7 @@ if ($destroy) {
 $this->metadataBag->stampNew();
 }
 $ret = session_regenerate_id($destroy);
+if ('files'=== $this->getSaveHandler()->getSaveHandlerName()) {
 session_write_close();
 if (isset($_SESSION)) {
 $backup = $_SESSION;
@@ -147,6 +148,7 @@ session_start();
 $_SESSION = $backup;
 } else {
 session_start();
+}
 }
 return $ret;
 }
@@ -2767,7 +2769,7 @@ namespace
 {
 class Twig_Environment
 {
-const VERSION ='1.13.1';
+const VERSION ='1.13.2';
 protected $charset;
 protected $loader;
 protected $debug;
@@ -3101,7 +3103,7 @@ return $tags;
 public function addNodeVisitor(Twig_NodeVisitorInterface $visitor)
 {
 if ($this->extensionInitialized) {
-throw new LogicException('Unable to add a node visitor as extensions have already been initialized.', $extension->getName());
+throw new LogicException('Unable to add a node visitor as extensions have already been initialized.');
 }
 $this->staging->addNodeVisitor($visitor);
 }
@@ -5664,7 +5666,6 @@ namespace Sensio\Bundle\FrameworkExtraBundle\EventListener
 {
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterManager;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -5901,6 +5902,7 @@ return $this->registry->getManager($name);
 namespace Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter
 {
 use Symfony\Component\HttpFoundation\Request;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ConfigurationInterface;
 class ParamConverterManager
 {
 protected $converters = array();
@@ -5914,7 +5916,7 @@ foreach ($configurations as $configuration) {
 $this->applyConverter($request, $configuration);
 }
 }
-protected function applyConverter(Request $request, $configuration)
+protected function applyConverter(Request $request, ConfigurationInterface $configuration)
 {
 $value = $request->attributes->get($configuration->getName());
 $className = $configuration->getClass();
@@ -5969,7 +5971,6 @@ return $converters;
 }
 namespace Sensio\Bundle\FrameworkExtraBundle\EventListener
 {
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\FilterResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
